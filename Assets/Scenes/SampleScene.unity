@@ -2059,13 +2059,20 @@ MonoBehaviour:
       m_Calls: []
   Velocity: 0
   _cellReferences:
-    _baseType: SimpleRecyclerCollection.Example.MyMainCellData
+    _baseType: SimpleRecyclerCollection.Example.MyMainCellData, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     _references:
-    - _type: SimpleRecyclerCollection.Example.MyThirdCellData
+    - _assemblyQualifiedName: SimpleRecyclerCollection.Example.MyThirdCellData, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      _type: MyThirdCellData
       _view: {fileID: 403757091990575444, guid: 662fcfc9d16f4914188b0485e9a1dd4e, type: 3}
-    - _type: SimpleRecyclerCollection.Example.MySecondCellData
+    - _assemblyQualifiedName: SimpleRecyclerCollection.Example.MySecondCellData,
+        Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      _type: MySecondCellData
       _view: {fileID: 2703973313691798327, guid: a7516b5bf2cd13e429dea888f5d111de, type: 3}
-    - _type: SimpleRecyclerCollection.Example.MyMainCellData
+    - _assemblyQualifiedName: SimpleRecyclerCollection.Example.MyMainCellData, Assembly-CSharp,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      _type: MyMainCellData
       _view: {fileID: 6342607511765829886, guid: 3083853f47404884890212e48bbcbd9c, type: 3}
   _cachedCellCount: 0
 --- !u!114 &472362878
@@ -8771,7 +8778,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -44.997986}
+  m_AnchoredPosition: {x: 0, y: -44.998047}
   m_SizeDelta: {x: 0, y: -90.005}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2027460700
@@ -9421,12 +9428,12 @@ MonoBehaviour:
   _autoTuples: 0
   _tupleCount: 1
   _expand: 0
+  _align: 0
   _padding:
     m_Left: 0
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  _align: 0
   _spacing: {x: 0, y: 0}
   OnMarkedDirty:
     m_PersistentCalls:

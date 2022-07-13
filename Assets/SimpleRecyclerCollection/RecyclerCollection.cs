@@ -136,6 +136,8 @@ namespace SimpleRecyclerCollection
         {
             if (_cellReferences == null)
                 _cellReferences = new CellReference<TCellData, TCellView>();
+            else
+                _cellReferences.OnValidate();
         }
 
         protected sealed override void UpdatePool()
@@ -401,6 +403,13 @@ namespace SimpleRecyclerCollection
             return reusableCell;
         }
 
+        private TCellView CreateCellView(Type viewType)
+        {
+            TCellView view = Instantiate(FindCellViewPrefab(viewType), Content.RectTransform);
+            view.RectTransform.sizeDelta = _currentCellSize;
+            return view;
+        }
+
         private Type FindCellViewPrefabType(TCellData cellData)
         {
             Type cellDataType = cellData.GetType();
@@ -413,11 +422,13 @@ namespace SimpleRecyclerCollection
             return _cellDefaultPrefab.GetType();
         }
 
-        private TCellView CreateCellView(Type viewType)
+        protected TCellView FindCellViewPrefab(Type viewType)
         {
-            TCellView view = Instantiate(FindCellViewPrefab(viewType), Content.RectTransform);
-            view.RectTransform.sizeDelta = _currentCellSize;
-            return view;
+            for (int i = 0; i < _cellReferences.References.Length; i++)
+                if (_cellReferences.References[i].View.GetType() == viewType)
+                    return _cellReferences.References[i].View;
+
+            return null;
         }
 
         private void SwapOrCreateCellView(ref ReusableCell target, TCellData data)
@@ -450,15 +461,6 @@ namespace SimpleRecyclerCollection
 
             target.View = CreateCellView(viewType);
             target.View.gameObject.SetActive(false);
-        }
-
-        protected TCellView FindCellViewPrefab(Type viewType)
-        {
-            for (int i = 0; i < _cellReferences.References.Length; i++)
-                if (_cellReferences.References[i].View.GetType() == viewType)
-                    return _cellReferences.References[i].View;
-
-            return null;
         }
 
         public virtual void SnapTo(int index)

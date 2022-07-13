@@ -1,4 +1,4 @@
-namespace SimpleRecyclerCollection
+namespace SimpleRecyclerCollection.Core
 {
     using System;
 
@@ -12,6 +12,9 @@ namespace SimpleRecyclerCollection
         [Serializable]
         public class Reference
         {
+            public string AssemblyQualifiedName { get => _type; set => _type = value; }
+            [SerializeField] public string _assemblyQualifiedName;
+
             public string Type { get => _type; set => _type = value; }
             [SerializeField] public string _type;
 
@@ -24,6 +27,10 @@ namespace SimpleRecyclerCollection
 
         // Constructors
 
-        public CellReference() => _baseType = typeof(TCellData).ToString();
+        public CellReference() => OnValidate();
+
+        // Methods
+
+        public void OnValidate() => _baseType = typeof(TCellData).AssemblyQualifiedName;
     }
 }
