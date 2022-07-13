@@ -1,6 +1,6 @@
 # SimpleRecyclerCollection (v1.0.0)
 
-Generic optimized ScrollRect that can handle a huge amount of data with using pooling objects. 
+Generic optimized ScrollRect for Unity that can handle a huge amount of data with using pooling objects. 
 
 It also support different inherited classes for data and views.
 
