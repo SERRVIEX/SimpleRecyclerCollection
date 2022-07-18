@@ -9,8 +9,8 @@ namespace SimpleRecyclerCollection
 
     using Core;
 
-    public partial class RecyclerCollection<TCellData, TCellView> : Collection
-       where TCellData : class, new()
+    public class RecyclerCollection<TCellData, TCellView> : Collection
+       where TCellData : class
        where TCellView : CellView<TCellData>
     {
         public CollectionData<TCellData> Data
@@ -101,16 +101,23 @@ namespace SimpleRecyclerCollection
 
         public override void Initialize()
         {
+            if (IsInitialized)
+                return;
+
+            if (!gameObject.activeInHierarchy)
+                Awake();
+
             for (int i = 0; i < _cellReferences.References.Length; i++)
             {
                 var reference = _cellReferences.References[i];
 
                 Assert.IsTrue(reference.View != null);
 
-                Type cellDataType = Type.GetType(reference.Type);
+                Type cellDataType = Type.GetType(reference.DataTypeAssemblyQualifiedName);
+
                 _cellViewPrefabsDistributed.Add(cellDataType, reference.View);
 
-                if(reference.View.GetType() == typeof(TCellView))
+                if (reference.View.GetType() == typeof(TCellView))
                     _cellDefaultPrefab = reference.View;
             }
 

@@ -2059,20 +2059,20 @@ MonoBehaviour:
       m_Calls: []
   Velocity: 0
   _cellReferences:
-    _baseType: SimpleRecyclerCollection.Example.MyMainCellData, Assembly-CSharp,
+    _baseDataType: SimpleRecyclerCollection.Example.MyMainCellData, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     _references:
-    - _assemblyQualifiedName: SimpleRecyclerCollection.Example.MyThirdCellData, Assembly-CSharp,
-        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      _type: MyThirdCellData
-      _view: {fileID: 403757091990575444, guid: 662fcfc9d16f4914188b0485e9a1dd4e, type: 3}
-    - _assemblyQualifiedName: SimpleRecyclerCollection.Example.MySecondCellData,
+    - _dataTypeAssemblyQualifiedName: SimpleRecyclerCollection.Example.MyThirdCellData,
         Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      _type: MySecondCellData
+      _dataType: MyThirdCellData
+      _view: {fileID: 403757091990575444, guid: 662fcfc9d16f4914188b0485e9a1dd4e, type: 3}
+    - _dataTypeAssemblyQualifiedName: SimpleRecyclerCollection.Example.MySecondCellData,
+        Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      _dataType: MySecondCellData
       _view: {fileID: 2703973313691798327, guid: a7516b5bf2cd13e429dea888f5d111de, type: 3}
-    - _assemblyQualifiedName: SimpleRecyclerCollection.Example.MyMainCellData, Assembly-CSharp,
-        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      _type: MyMainCellData
+    - _dataTypeAssemblyQualifiedName: SimpleRecyclerCollection.Example.MyMainCellData,
+        Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      _dataType: MyMainCellData
       _view: {fileID: 6342607511765829886, guid: 3083853f47404884890212e48bbcbd9c, type: 3}
   _cachedCellCount: 0
 --- !u!114 &472362878

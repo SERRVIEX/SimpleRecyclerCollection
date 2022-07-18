@@ -4,19 +4,20 @@ namespace SimpleRecyclerCollection.Core
     using UnityEngine.Events;
 
     [RequireComponent(typeof(CollectionLayoutGroup))]
-    public class CollectionContent : MonoBehaviour
+    public sealed class CollectionContent : MonoBehaviour
     {
-        public RectTransform RectTransform { get; private set; }
+        public RectTransform RectTransform => _rectTransform;
+        [SerializeField] private RectTransform _rectTransform;
 
         [HideInInspector] public UnityEvent OnTransformsDimensionsChanged = new UnityEvent();
 
         // Methods
 
-        private void Awake() => RectTransform = GetComponent<RectTransform>();
-
         private void OnValidate()
         {
-            if(!Application.isPlaying)
+            _rectTransform = GetComponent<RectTransform>();
+
+            if (!Application.isPlaying)
                 if (GetComponent<CollectionLayoutGroup>() == null)
                     gameObject.AddComponent<CollectionLayoutGroup>();
         }

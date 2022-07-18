@@ -31,16 +31,16 @@ namespace SimpleRecyclerCollection.Core
             rect.position = position;
             rect.height = _singleLineHeight;
 
-            SerializedProperty baseTypeProperty = property.FindPropertyRelative("_baseType");
+            SerializedProperty baseTypeProperty = property.FindPropertyRelative("_baseDataType");
 
             GUI.enabled = false;
-            RawPropertyField(property, "_baseType", "Base Type", ref rect);
+            RawPropertyField(property, "_baseDataType", "Base Data Type", ref rect);
             GUI.enabled = true;
 
             if (!string.IsNullOrEmpty(baseTypeProperty.stringValue))
             {
                 Type baseType = Type.GetType(baseTypeProperty.stringValue);
-               
+
                 if (baseType != null)
                     OnMainGUI(ref rect, property, baseType);
                 else
@@ -63,7 +63,7 @@ namespace SimpleRecyclerCollection.Core
             for (int i = itemsProperty.arraySize - 1; i >= 0; i--)
             {
                 SerializedProperty item = itemsProperty.GetArrayElementAtIndex(i);
-                string assemblyQualifiedName = item.FindPropertyRelative("_assemblyQualifiedName").stringValue;
+                string assemblyQualifiedName = item.FindPropertyRelative("_dataTypeAssemblyQualifiedName").stringValue;
 
                 Type t = Type.GetType(assemblyQualifiedName);
 
@@ -78,8 +78,8 @@ namespace SimpleRecyclerCollection.Core
             {
                 itemsProperty.InsertArrayElementAtIndex(0);
                 SerializedProperty itemProperty = itemsProperty.GetArrayElementAtIndex(0);
-                itemProperty.FindPropertyRelative("_assemblyQualifiedName").stringValue = options[i].AssemblyQualifiedName;
-                itemProperty.FindPropertyRelative("_type").stringValue = options[i].Name;
+                itemProperty.FindPropertyRelative("_dataTypeAssemblyQualifiedName").stringValue = options[i].AssemblyQualifiedName;
+                itemProperty.FindPropertyRelative("_dataType").stringValue = options[i].Name;
             }
 
             // Draw items.
@@ -90,11 +90,11 @@ namespace SimpleRecyclerCollection.Core
                 EditorGUI.indentLevel++;
                 SerializedProperty itemProperty = itemsProperty.GetArrayElementAtIndex(i);
                 GUI.enabled = false;
-                RawPropertyField(itemProperty, "_assemblyQualifiedName", "Assembly Qualified Name", ref rect);
-                RawPropertyField(itemProperty, "_type", "Data", ref rect);
+                RawPropertyField(itemProperty, "_dataTypeAssemblyQualifiedName", "Data Type Assembly Qualified Name", ref rect);
+                RawPropertyField(itemProperty, "_dataType", "Data Type", ref rect);
                 GUI.enabled = true;
                 RawPropertyField(itemProperty, "_view", $"View", ref rect);
-                EditorGUI.indentLevel-= 2;
+                EditorGUI.indentLevel -= 2;
             }
         }
 

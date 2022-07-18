@@ -7,23 +7,23 @@ namespace SimpleRecyclerCollection.Core
     [Serializable]
     public sealed class CellReference<TCellData, TCellView> where TCellView : CellView<TCellData>
     {
-        [SerializeField] private string _baseType;
+        [SerializeField] private string _baseDataType;
 
         [Serializable]
         public class Reference
         {
-            public string AssemblyQualifiedName { get => _type; set => _type = value; }
-            [SerializeField] public string _assemblyQualifiedName;
+            public string DataTypeAssemblyQualifiedName { get => _dataTypeAssemblyQualifiedName; set => _dataTypeAssemblyQualifiedName = value; }
+            [SerializeField] private string _dataTypeAssemblyQualifiedName;
 
-            public string Type { get => _type; set => _type = value; }
-            [SerializeField] public string _type;
+            public string DataType { get => _dataType; set => _dataType = value; }
+            [SerializeField] private string _dataType;
 
             public TCellView View { get => _view; set => _view = value; }
-            [SerializeField] public TCellView _view;
+            [SerializeField] private TCellView _view;
         }
 
         public Reference[] References { get => _references; set => _references = value; }
-        [SerializeField] public Reference[] _references;
+        [SerializeField] private Reference[] _references;
 
         // Constructors
 
@@ -31,6 +31,6 @@ namespace SimpleRecyclerCollection.Core
 
         // Methods
 
-        public void OnValidate() => _baseType = typeof(TCellData).AssemblyQualifiedName;
+        public void OnValidate() => _baseDataType = typeof(TCellData).AssemblyQualifiedName;
     }
 }
