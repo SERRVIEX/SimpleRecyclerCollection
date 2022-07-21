@@ -32,10 +32,10 @@ namespace SimpleRecyclerCollection.Core
 
         public MovementType Movement
         {
-            get => m_Movement; 
+            get => m_Movement;
             set
             {
-                m_Movement = value; 
+                m_Movement = value;
                 RebuildLayout();
             }
         }
@@ -252,7 +252,6 @@ namespace SimpleRecyclerCollection.Core
                 return;
 
             _isDragging = true;
-
             _positionHelper = Position;
 
             _pointerStartPosition = Vector2.zero;
@@ -270,17 +269,14 @@ namespace SimpleRecyclerCollection.Core
             if (!IsActive())
                 return;
 
-            _isDragging = true;
-
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(Content.RectTransform, eventData.position, eventData.pressEventCamera, out Vector2 pointerPosition))
-                return;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(Content.RectTransform, eventData.position, eventData.pressEventCamera, out Vector2 pointerPosition);
 
             Vector2 pointerDelta = pointerPosition - _pointerStartPosition;
             if (Direction == ScrollDirection.Horizontal)
                 pointerDelta = -pointerDelta;
 
             Position = _positionHelper + pointerDelta;
-          
+
             if (m_Movement != MovementType.Unrestricted)
             {
                 float offset = CalculateOffset(Position[MainAxis]);
@@ -296,6 +292,9 @@ namespace SimpleRecyclerCollection.Core
 
         public void OnEndDrag(PointerEventData eventData)
         {
+            if (!IsInitialized)
+                return;
+
             if (eventData.button != PointerEventData.InputButton.Left)
                 return;
 
