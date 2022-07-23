@@ -2,8 +2,12 @@ namespace SimpleRecyclerCollection
 {
     using UnityEngine;
     using UnityEngine.Events;
+    using UnityEngine.EventSystems;
 
-    public sealed class CollectionLayoutGroup : MonoBehaviour
+    /// <summary>
+    /// Contains only values which are used in Collections.
+    /// </summary>
+    public sealed class CollectionLayoutGroup : UIBehaviour
     {
         public bool AutoTuples
         {
@@ -89,14 +93,18 @@ namespace SimpleRecyclerCollection
 
         [SerializeField] private Vector2 _spacing;
 
-        public UnityEvent OnMarkedDirty = new UnityEvent();
+#if UNITY_EDITOR
+        [HideInInspector] public UnityEvent OnMarkedDirty = new UnityEvent();
+#endif
 
         // Methods
 
         private void OnValidate()
         {
-            if(Application.isPlaying)
+#if UNITY_EDITOR
+            if (Application.isPlaying)
                 OnMarkedDirty?.Invoke();
+#endif
 
             _spacing = new Vector2(Mathf.Clamp(_spacing.x, 0, 250), Mathf.Clamp(_spacing.y, 0, 250));
         }

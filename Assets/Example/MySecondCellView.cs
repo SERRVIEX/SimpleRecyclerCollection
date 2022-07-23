@@ -3,13 +3,13 @@ namespace SimpleRecyclerCollection.Example
     using UnityEngine;
     using UnityEngine.UI;
 
-    public class MySecondCellView : MyMainCellView
+    public class MySecondCellView : MyCellView
     {
         [SerializeField] private Image _thumbnail;
 
         // Methods
 
-        public override void OnContentUpdate(int index, MyMainCellData data)
+        public override void OnContentUpdate(int index, MyCellData data)
         {
             base.OnContentUpdate(index, data);
 

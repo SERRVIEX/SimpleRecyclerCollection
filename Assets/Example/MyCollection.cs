@@ -2,5 +2,5 @@ namespace SimpleRecyclerCollection.Example
 {
     using SimpleRecyclerCollection;
 
-    public class MyCollection : RecyclerCollection<MyMainCellData, MyMainCellView> { }
+    public class MyCollection : RecyclerCollection<MyCellData, MyCellView> { }
 }

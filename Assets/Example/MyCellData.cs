@@ -1,6 +1,6 @@
 namespace SimpleRecyclerCollection.Example
 {
-    public class MyMainCellData
+    public class MyCellData
     {
         public string Title;
     }

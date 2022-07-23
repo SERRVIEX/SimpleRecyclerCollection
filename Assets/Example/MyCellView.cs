@@ -3,7 +3,7 @@ namespace SimpleRecyclerCollection.Example
     using UnityEngine;
     using UnityEngine.UI;
 
-    public class MyMainCellView : CellView<MyMainCellData>
+    public class MyCellView : CellView<MyCellData>
     {
         public override RectTransform RectTransform => m_RectTransform;
         [SerializeField] protected RectTransform m_RectTransform;
@@ -18,7 +18,7 @@ namespace SimpleRecyclerCollection.Example
                 m_RectTransform = GetComponent<RectTransform>();
         }
 
-        public override void OnContentUpdate(int index, MyMainCellData data)
+        public override void OnContentUpdate(int index, MyCellData data)
         {
             Title.text = data.Title;
         }

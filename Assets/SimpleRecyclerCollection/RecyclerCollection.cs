@@ -32,9 +32,7 @@ namespace SimpleRecyclerCollection
 
         private CollectionData<TCellData> _data;
 
-        [SerializeField] private CellReference<TCellData, TCellView> _cellReferences = new CellReference<TCellData, TCellView>();
-        private Dictionary<Type, TCellView> _cellViewPrefabsDistributed = new Dictionary<Type, TCellView>();
-        private TCellView _cellDefaultPrefab;
+        [SerializeField] private TCellView _cellPrefab;
 
         /// <summary>
         /// Create additional cells in cache (cellCount * tupleCount).
@@ -92,36 +90,22 @@ namespace SimpleRecyclerCollection
         /// </summary>
         private List<ReusableCell> _reusableCells = new List<ReusableCell>();
 
-        /// <summary>
-        /// Views that can potentially be used in a reusable cell through swap.
-        /// </summary>
-        private List<TCellView> _reusableCellViews = new List<TCellView>();
-
         // Methods
 
         public override void Initialize()
         {
             if (IsInitialized)
+            {
+                Debug.Log($"Collection already initialized.");
                 return;
+            }
 
+            // Awake is called only if the object is active, so if it isn't active in
+            // the hierarchy, force it to get the components.
             if (!gameObject.activeInHierarchy)
                 Awake();
 
-            for (int i = 0; i < _cellReferences.References.Length; i++)
-            {
-                var reference = _cellReferences.References[i];
-
-                Assert.IsTrue(reference.View != null);
-
-                Type cellDataType = Type.GetType(reference.DataTypeAssemblyQualifiedName);
-
-                _cellViewPrefabsDistributed.Add(cellDataType, reference.View);
-
-                if (reference.View.GetType() == typeof(TCellView))
-                    _cellDefaultPrefab = reference.View;
-            }
-
-            IsInitialized = true;
+            Assert.IsTrue(_cellPrefab != null);
 
             _data = new CollectionData<TCellData>();
             _data.OnMarkedDirty.AddListener(() =>
@@ -133,26 +117,29 @@ namespace SimpleRecyclerCollection
             Content.OnTransformsDimensionsChanged.AddListener(RebuildLayout);
             LayoutGroup.OnMarkedDirty.AddListener(RebuildLayout);
 
-            _initialCellSize = _cellDefaultPrefab.RectTransform.rect.size;
+            _initialCellSize = _cellPrefab.RectTransform.rect.size;
             _currentCellSize = _initialCellSize;
 
-            RebuildLayout();
-        }
+            IsInitialized = true;
 
-        protected override void OnValidate()
-        {
-            if (_cellReferences == null)
-                _cellReferences = new CellReference<TCellData, TCellView>();
-            else
-                _cellReferences.OnValidate();
+            RebuildLayout();
         }
 
         protected sealed override void UpdatePool()
         {
             _numberOfCells = Mathf.Clamp(CalculateNumberOfCells(), 0, 512);
 
+            // Create missing cells.
+            if (_numberOfCells > _reusableCells.Count)
+            {
+                for (int i = _reusableCells.Count; i < _numberOfCells; i++)
+                {
+                    TCellView view = Instantiate(_cellPrefab, Content.RectTransform);
+                    _reusableCells.Add(new ReusableCell(view));
+                }
+            }
             // Destroy unused reusable cells to free memory.
-            if (_numberOfCells < _reusableCells.Count)
+            else if (_numberOfCells < _reusableCells.Count)
             {
                 int count = _reusableCells.Count - _numberOfCells;
 
@@ -166,16 +153,11 @@ namespace SimpleRecyclerCollection
                         break;
                 }
             }
-
-            while (_reusableCellViews.Count > 64)
-            {
-                Destroy(_reusableCellViews[0].gameObject);
-                _reusableCellViews.RemoveAt(0);
-            }
         }
 
         protected sealed override void UpdateProperties()
         {
+            // Get scrolling direction.
             MainAxis = (int)Direction;
             SecondAxis = MainAxis == 0 ? 1 : 0;
 
@@ -224,29 +206,24 @@ namespace SimpleRecyclerCollection
             // Force to ignore where the main axis pivot point of the content is.
             float centerOfContent = contentSize[SecondAxis] * (.5f - Content.RectTransform.pivot[SecondAxis]);
 
-            for (int reusableCellIndex = 0, positionAlongMainAxis = -1, tupleIndex = 0; reusableCellIndex < _numberOfCells; reusableCellIndex++)
+            for (int reusableCellIndex = 0, positionAlongMainAxis = -1, tupleIndex = 0; reusableCellIndex < _reusableCells.Count; reusableCellIndex++, tupleIndex++)
             {
                 int index = targetIndex + reusableCellIndex;
                 if (index % _currentTupleCount == 0)
                     positionAlongMainAxis++;
 
-                ReusableCell reusableCell = reusableCellIndex < _reusableCells.Count ? _reusableCells[reusableCellIndex] : null;
+                ReusableCell reusableCell = _reusableCells[CircularIndex(index, _reusableCells.Count)];
 
-                if (index < 0 || index >= _data.Count || targetPosition > 1)
+                if (index < 0 || index >= _data.Count)
                 {
-                    if (reusableCell != null)
-                        reusableCell.ActiveSelf = false;
+                    reusableCell.ActiveSelf = false;
                     continue;
                 }
 
+                // Simple circular index.
+                tupleIndex %= _currentTupleCount;
+
                 TCellData data = _data[index];
-
-                if (reusableCell == null)
-                    reusableCell = CreateReusableCell(FindCellViewPrefabType(data));
-
-                // Don't try to swap or create a cell view if there is only one type of cell view prefab.
-                if (_cellViewPrefabsDistributed.Count > 1)
-                    SwapOrCreateCellView(ref reusableCell, data);
 
                 if (reusableCell.Index != index || reusableCell.Data != data || !reusableCell.ActiveSelf)
                 {
@@ -273,14 +250,20 @@ namespace SimpleRecyclerCollection
                 reusableCell.View.RectTransform.sizeDelta = _currentCellSize;
                 reusableCell.View.RectTransform.localPosition = localPosition;
                 reusableCell.View.OnPositionUpdate(localPosition);
-
-                // Process tuples.
-                tupleIndex++;
-                if (tupleIndex == _currentTupleCount)
-                    tupleIndex = 0;
             }
 
             CalculateNormalizedPosition();
+        }
+
+        /// <summary>
+        /// Complex circular index.
+        /// </summary>
+        private int CircularIndex(int i, int size)
+        {
+            if (i < 0) 
+                return size - 1 + (i + 1) % size;
+
+            return (i + 1) % size;
         }
 
         protected sealed override int CalculateNumberOfCells()
@@ -400,74 +383,6 @@ namespace SimpleRecyclerCollection
             CachedAlign = (cellSizeWithSpace[SecondAxis] - secondAxisSize) / 2 - LayoutGroup.Spacing[SecondAxis] / 2 * align;
             CachedAlign -= align * (Content.RectTransform.rect.size[SecondAxis] - secondAxisSize);
             CachedAlign = CachedAlign + contentSize[SecondAxis] / 2 * align - secondAxisSize / 2 * align;
-        }
-
-        private ReusableCell CreateReusableCell(Type viewType)
-        {
-            TCellView view = CreateCellView(viewType);
-            ReusableCell reusableCell = new ReusableCell(view);
-            _reusableCells.Add(reusableCell);
-            return reusableCell;
-        }
-
-        private TCellView CreateCellView(Type viewType)
-        {
-            TCellView view = Instantiate(FindCellViewPrefab(viewType), Content.RectTransform);
-            view.RectTransform.sizeDelta = _currentCellSize;
-            return view;
-        }
-
-        private Type FindCellViewPrefabType(TCellData cellData)
-        {
-            Type cellDataType = cellData.GetType();
-
-            if (_cellViewPrefabsDistributed.TryGetValue(cellDataType, out TCellView cellView))
-                return cellView.GetType();
-
-            Debug.LogError($"Cell view prefab not found for the {cellDataType}.");
-
-            return _cellDefaultPrefab.GetType();
-        }
-
-        protected TCellView FindCellViewPrefab(Type viewType)
-        {
-            for (int i = 0; i < _cellReferences.References.Length; i++)
-                if (_cellReferences.References[i].View.GetType() == viewType)
-                    return _cellReferences.References[i].View;
-
-            return null;
-        }
-
-        private void SwapOrCreateCellView(ref ReusableCell target, TCellData data)
-        {
-            Type viewType = FindCellViewPrefabType(data);
-
-            if (target.View.GetType() == viewType)
-                return;
-
-            target.View.gameObject.SetActive(false);
-            _reusableCellViews.Add(target.View);
-
-            while (_reusableCellViews.Count > 64)
-            {
-                Destroy(_reusableCellViews[0].gameObject);
-                _reusableCellViews.RemoveAt(0);
-            }
-
-            for (int i = 0; i < _reusableCellViews.Count; i++)
-            {
-                if (_reusableCellViews[i].GetType() == viewType)
-                {
-                    TCellView view = _reusableCellViews[i];
-                    _reusableCellViews.RemoveAt(i);
-
-                    target.View = view;
-                    return;
-                }
-            }
-
-            target.View = CreateCellView(viewType);
-            target.View.gameObject.SetActive(false);
         }
 
         public virtual void SnapTo(int index)

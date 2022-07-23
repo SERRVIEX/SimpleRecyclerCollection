@@ -23,7 +23,7 @@ namespace SimpleRecyclerCollection
             "m_DecelerationRate",
             "m_Viewport",
             "m_OnValueChanged",
-            "_cellReferences",
+            "_cellPrefab",
             "_cachedCellCount"
         };
 
@@ -39,7 +39,7 @@ namespace SimpleRecyclerCollection
 
             TitleBar("Cells");
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_cellReferences"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_cellPrefab"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_cachedCellCount"));
 
             TitleBar("Other Properties");

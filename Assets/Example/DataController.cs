@@ -13,9 +13,7 @@ namespace SimpleRecyclerCollection.Example
 
         [SerializeField] private InputField _inputCount;
         [SerializeField] private InputField _inputIndex;
-        [SerializeField] private Button _addType1;
-        [SerializeField] private Button _addType2;
-        [SerializeField] private Button _addType3;
+        [SerializeField] private Button _addPrefab;
 
         [SerializeField] private InputField _toIndex;
         [SerializeField] private Button _snapTo;
@@ -31,54 +29,21 @@ namespace SimpleRecyclerCollection.Example
             _inputIndex.text = 0.ToString();
             _toIndex.text = 0.ToString();
 
-            _addType1.onClick.AddListener(() =>
+            _addPrefab.onClick.AddListener(() =>
             {
                 int count = int.Parse(_inputCount.text);
                 int index = int.Parse(_inputIndex.text);
 
-                List<MyMainCellData> list = new List<MyMainCellData>();
+                List<MyCellData> list = new List<MyCellData>();
 
                 for (int i = 0; i < count; i++)
                 {
-                    MyMainCellData data = new MyMainCellData();
+                    MyCellData data = new MyCellData();
                     data.Title = $"Main Cell {Random.Range(9000, 9999)}";
                     list.Add(data);
                 }
 
                 _collection.Data.Insert(index, list);
-            });
-
-            _addType2.onClick.AddListener(() =>
-            {
-                int count = int.Parse(_inputCount.text);
-                int index = int.Parse(_inputIndex.text);
-                MySecondCellData[] array = new MySecondCellData[count];
-
-                for (int i = 0; i < count; i++)
-                {
-                    MySecondCellData data = new MySecondCellData();
-                    data.Title = $"Cat {Random.Range(9000, 9999)}";
-                    data.Thumbnail = _sprites[Random.Range(0, _sprites.Length)];
-                    array[i] = data;
-                }
-
-                _collection.Data.Insert(index, array);
-            });
-
-            _addType3.onClick.AddListener(() =>
-            {
-                int count = int.Parse(_inputCount.text);
-                int index = int.Parse(_inputIndex.text);
-
-                for (int i = 0; i < count; i++)
-                {
-                    MyThirdCellData data = new MyThirdCellData();
-                    Color color = Random.ColorHSV();
-                    string hex = ColorUtility.ToHtmlStringRGBA(color);
-                    data.Title = hex;
-                    data.BackgroundColor = color;
-                    _collection.Data.Insert(index, data);
-                } 
             });
 
             _snapTo.onClick.AddListener(() =>
