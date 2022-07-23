@@ -197,13 +197,6 @@ namespace SimpleRecyclerCollection.Core
                 return;
             }
 
-            // Avoid exception division by zero.
-            if (ContentVirtualSize == 0)
-            {
-                _normalizedPosition = 0;
-                return;
-            }
-
             if (ContentVirtualSize < Content.RectTransform.rect.size[MainAxis])
             {
                 _normalizedPosition = Position[MainAxis] < 0 ? 0 : 1;
