@@ -77,24 +77,9 @@ namespace SimpleRecyclerCollection.Core
         /// <summary>
         /// The size of all cells and the space between them along with the padding on the main axis.
         /// </summary>
-        protected float ContentVirtualSize
-        {
-            get => _contentVirtualSize;
-            set
-            {
-                _contentVirtualSize = value;
-                _maxNormalizedPosition = value - Content.RectTransform.rect.size[MainAxis];
-            }
-        }
-
-        private float _contentVirtualSize;
+        protected float ContentVirtualSize;
 
         protected float MaxScrollPosition;
-
-        /// <summary>
-        /// Helps to get the correct normalized position value.
-        /// </summary>
-        private float _maxNormalizedPosition;
 
         /// <summary>
         /// Offset calculated on layout group update.
@@ -203,7 +188,7 @@ namespace SimpleRecyclerCollection.Core
                 return;
             }
 
-            _normalizedPosition = Position[MainAxis] / _maxNormalizedPosition;
+            _normalizedPosition = Position[MainAxis] / MaxScrollPosition;
         }
 
         protected float CalculateOffset(float position)
