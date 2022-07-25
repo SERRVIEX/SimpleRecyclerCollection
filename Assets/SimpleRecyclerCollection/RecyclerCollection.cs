@@ -181,12 +181,6 @@ namespace SimpleRecyclerCollection
             MaxScrollPosition = Mathf.Max(0, size - Content.RectTransform.rect.size[MainAxis]);
         }
 
-        public void UpdateCellViews()
-        {
-            for (int i = 0; i < _reusableCells.Count; i++)
-                _reusableCells[i].View.OnContentUpdate(_reusableCells[i].Index, _reusableCells[i].Data);
-        }
-
         protected sealed override void UpdatePosition()
         {
             Vector2 contentSize = Content.RectTransform.rect.size;
@@ -385,6 +379,22 @@ namespace SimpleRecyclerCollection
             CachedAlign = (cellSizeWithSpace[SecondAxis] - secondAxisSize) / 2 - LayoutGroup.Spacing[SecondAxis] / 2 * align;
             CachedAlign -= align * (Content.RectTransform.rect.size[SecondAxis] - secondAxisSize);
             CachedAlign = CachedAlign + contentSize[SecondAxis] / 2 * align - secondAxisSize / 2 * align;
+        }
+
+        /// <summary>
+        /// Update the content of all cells.
+        /// </summary>
+        public void Refresh()
+        {
+            for (int i = 0; i < _reusableCells.Count; i++)
+            {
+                ReusableCell reusableCell = _reusableCells[i];
+                if (reusableCell.ActiveSelf)
+                {
+                    reusableCell.View.OnContentRefresh();
+                    reusableCell.View.OnPositionRefresh();
+                }
+            }
         }
 
         public virtual void SnapTo(int index)

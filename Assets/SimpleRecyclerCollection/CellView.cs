@@ -10,5 +10,8 @@ namespace SimpleRecyclerCollection
 
         public abstract void OnContentUpdate(int index, TData data);
         public abstract void OnPositionUpdate(Vector3 localPosition);
+
+        public virtual void OnContentRefresh() { }
+        public virtual void OnPositionRefresh() { }
     }
 }
