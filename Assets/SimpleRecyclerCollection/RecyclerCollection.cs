@@ -1,6 +1,5 @@
 namespace SimpleRecyclerCollection
 {
-    using System;
     using System.Collections;
     using System.Collections.Generic;
 
@@ -85,9 +84,6 @@ namespace SimpleRecyclerCollection
             }
         }
 
-        /// <summary>
-        /// All available reusable cells.
-        /// </summary>
         private List<ReusableCell> _reusableCells = new List<ReusableCell>();
 
         // Methods
@@ -183,6 +179,12 @@ namespace SimpleRecyclerCollection
 
             ContentVirtualSize = size;
             MaxScrollPosition = Mathf.Max(0, size - Content.RectTransform.rect.size[MainAxis]);
+        }
+
+        public void UpdateCellViews()
+        {
+            for (int i = 0; i < _reusableCells.Count; i++)
+                _reusableCells[i].View.OnContentUpdate(_reusableCells[i].Index, _reusableCells[i].Data);
         }
 
         protected sealed override void UpdatePosition()

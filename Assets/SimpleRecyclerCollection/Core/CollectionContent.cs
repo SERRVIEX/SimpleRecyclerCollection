@@ -11,6 +11,8 @@ namespace SimpleRecyclerCollection.Core
 
         [HideInInspector] public UnityEvent OnTransformsDimensionsChanged = new UnityEvent();
 
+        private bool _markedDirty;
+
         // Methods
 
         private void OnValidate()
@@ -22,6 +24,15 @@ namespace SimpleRecyclerCollection.Core
                     gameObject.AddComponent<CollectionLayoutGroup>();
         }
 
-        private void OnRectTransformDimensionsChange() => OnTransformsDimensionsChanged?.Invoke();
+        private void Update()
+        {
+            if(_markedDirty)
+            {
+                _markedDirty = false;
+                OnTransformsDimensionsChanged?.Invoke();
+            }
+        }
+
+        private void OnRectTransformDimensionsChange() => _markedDirty = true;
     }
 }
