@@ -59,6 +59,8 @@ namespace SimpleRecyclerCollection.Core
 
         [HideInInspector] public float Velocity;
 
+        protected AutoScroller AutoScroller { get; private set; }
+
         public float NormalizedPosition
         {
             get => _normalizedPosition;
@@ -66,6 +68,8 @@ namespace SimpleRecyclerCollection.Core
         }
 
         private float _normalizedPosition;
+
+        public float Position => m_Position[MainAxis];
 
         /// <summary>
         /// Can be X or Y.
@@ -101,7 +105,7 @@ namespace SimpleRecyclerCollection.Core
 
         private bool _isDragging;
 
-        protected Vector2 Position;
+        protected Vector2 m_Position;
         private Vector2 _previousPosition;
         private Vector2 _positionHelper;
         private Vector2 _pointerStartPosition = Vector2.zero;
@@ -116,6 +120,8 @@ namespace SimpleRecyclerCollection.Core
 
             Assert.IsFalse(Content == null);
             LayoutGroup = Content.GetComponent<CollectionLayoutGroup>();
+
+            AutoScroller = new AutoScroller(this);
         }
 
         protected override void OnValidate()
@@ -160,12 +166,12 @@ namespace SimpleRecyclerCollection.Core
             if (ContentVirtualSize == 0)
             {
                 _normalizedPosition = 0;
-                Position[MainAxis] = 0;
+                m_Position[MainAxis] = 0;
                 return;
             }
 
             _normalizedPosition = value;
-            Position[MainAxis] = ContentVirtualSize * _normalizedPosition;
+            m_Position[MainAxis] = ContentVirtualSize * _normalizedPosition;
 
             UpdatePosition();
         }
@@ -187,11 +193,11 @@ namespace SimpleRecyclerCollection.Core
 
             if (ContentVirtualSize < Content.RectTransform.rect.size[MainAxis])
             {
-                _normalizedPosition = Position[MainAxis] < 0 ? 0 : 1;
+                _normalizedPosition = m_Position[MainAxis] < 0 ? 0 : 1;
                 return;
             }
 
-            _normalizedPosition = Position[MainAxis] / MaxScrollPosition;
+            _normalizedPosition = m_Position[MainAxis] / MaxScrollPosition;
         }
 
         protected float CalculateOffset(float position)
@@ -233,7 +239,7 @@ namespace SimpleRecyclerCollection.Core
                 return;
 
             _isDragging = true;
-            _positionHelper = Position;
+            _positionHelper = m_Position;
 
             _pointerStartPosition = Vector2.zero;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(Content.RectTransform, eventData.position, eventData.pressEventCamera, out _pointerStartPosition);
@@ -250,22 +256,25 @@ namespace SimpleRecyclerCollection.Core
             if (!IsActive())
                 return;
 
+            if (AutoScroller.Active)
+                return;
+
             RectTransformUtility.ScreenPointToLocalPointInRectangle(Content.RectTransform, eventData.position, eventData.pressEventCamera, out Vector2 pointerPosition);
 
             Vector2 pointerDelta = pointerPosition - _pointerStartPosition;
             if (Direction == ScrollDirection.Horizontal)
                 pointerDelta = -pointerDelta;
 
-            Position = _positionHelper + pointerDelta;
+            m_Position = _positionHelper + pointerDelta;
 
             if (m_Movement != MovementType.Unrestricted)
             {
-                float offset = CalculateOffset(Position[MainAxis]);
-                Position[MainAxis] += offset;
+                float offset = CalculateOffset(m_Position[MainAxis]);
+                m_Position[MainAxis] += offset;
 
                 if (m_Movement == MovementType.Elastic)
                     if (offset != 0)
-                        Position[MainAxis] -= RubberDelta(offset, Content.RectTransform.rect.size[MainAxis] + LayoutGroup.Padding.vertical);
+                        m_Position[MainAxis] -= RubberDelta(offset, Content.RectTransform.rect.size[MainAxis] + LayoutGroup.Padding.vertical);
             }
 
             UpdatePosition();
@@ -280,7 +289,7 @@ namespace SimpleRecyclerCollection.Core
                 return;
 
             _isDragging = false;
-            _positionHelper = Position;
+            _positionHelper = m_Position;
         }
 
         protected virtual void LateUpdate()
@@ -288,53 +297,70 @@ namespace SimpleRecyclerCollection.Core
             if (!IsInitialized)
                 return;
 
-            float deltaTime = Time.unscaledDeltaTime;
-            float offset = CalculateOffset(Position[MainAxis]);
-
-            if (!_isDragging && (offset != 0 || Velocity != 0))
+            if (AutoScroller.Active)
             {
-                Vector2 position = Position;
+                float offset = CalculateOffset(m_Position[MainAxis]);
+                if (offset != 0)
+                    AutoScroller.Release();
+                else
+                    AutoScroller.Update();
 
-                // Apply spring physics if movement is elastic and content has an offset from the view.
-                if (Movement == MovementType.Elastic && offset != 0)
+                m_Position[MainAxis] = Mathf.Clamp(m_Position[MainAxis], 0, MaxScrollPosition);
+                UpdatePosition();
+
+                _previousPosition = m_Position;
+                return;
+            }
+
+            {
+                float deltaTime = Time.unscaledDeltaTime;
+                float offset = CalculateOffset(m_Position[MainAxis]);
+
+                if (!_isDragging && (offset != 0 || Velocity != 0))
                 {
-                    float speed = Velocity;
-                    position[MainAxis] = Mathf.SmoothDamp(Position[MainAxis], Position[MainAxis] + offset, ref speed, Elasticity, Mathf.Infinity, deltaTime);
-                    Velocity = speed;
-                }
-                // Else move content according to velocity with deceleration applied.
-                else if (Inertia)
-                {
-                    Velocity *= Mathf.Pow(DecelerationRate, deltaTime);
-                    if (Mathf.Abs(Velocity) < 1)
+                    Vector2 position = m_Position;
+
+                    // Apply spring physics if movement is elastic and content has an offset from the view.
+                    if (Movement == MovementType.Elastic && offset != 0)
+                    {
+                        float speed = Velocity;
+                        position[MainAxis] = Mathf.SmoothDamp(m_Position[MainAxis], m_Position[MainAxis] + offset, ref speed, Elasticity, Mathf.Infinity, deltaTime);
+                        Velocity = speed;
+                    }
+                    // Else move content according to velocity with deceleration applied.
+                    else if (Inertia)
+                    {
+                        Velocity *= Mathf.Pow(DecelerationRate, deltaTime);
+                        if (Mathf.Abs(Velocity) < 1)
+                            Velocity = 0;
+
+                        position[MainAxis] += Velocity * deltaTime;
+                    }
+                    // If we have neither elaticity or friction, there shouldn't be any velocity.
+                    else
                         Velocity = 0;
 
-                    position[MainAxis] += Velocity * deltaTime;
-                }
-                // If we have neither elaticity or friction, there shouldn't be any velocity.
-                else
-                    Velocity = 0;
-
-                if (Velocity != 0)
-                {
-                    if (Movement == MovementType.Clamped)
+                    if (Velocity != 0)
                     {
-                        offset = CalculateOffset(position[MainAxis]);
-                        position[MainAxis] += offset;
+                        if (Movement == MovementType.Clamped)
+                        {
+                            offset = CalculateOffset(position[MainAxis]);
+                            position[MainAxis] += offset;
+                        }
+
+                        m_Position = position;
+                        UpdatePosition();
                     }
-
-                    Position = position;
-                    UpdatePosition();
                 }
-            }
 
-            if (_isDragging && Inertia)
-            {
-                float newVelocity = (Position[MainAxis] - _previousPosition[MainAxis]) / deltaTime;
-                Velocity = Mathf.Lerp(Velocity, newVelocity, deltaTime * 10);
-            }
+                if (_isDragging && Inertia)
+                {
+                    float newVelocity = (m_Position[MainAxis] - _previousPosition[MainAxis]) / deltaTime;
+                    Velocity = Mathf.Lerp(Velocity, newVelocity, deltaTime * 10);
+                }
 
-            _previousPosition = Position;
+                _previousPosition = m_Position;
+            }
         }
     }
 }

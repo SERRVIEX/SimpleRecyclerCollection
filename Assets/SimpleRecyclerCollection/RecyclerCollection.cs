@@ -187,7 +187,7 @@ namespace SimpleRecyclerCollection
             // Get cell size given space.
             Vector2 cellSizeWithSpacing = _currentCellSize + LayoutGroup.Spacing;
             // Convert position to expected floating point index.
-            float indexedPosition = (Position[MainAxis] - CachedPadding[MainAxis]) / cellSizeWithSpacing[MainAxis];
+            float indexedPosition = (m_Position[MainAxis] - CachedPadding[MainAxis]) / cellSizeWithSpacing[MainAxis];
             // Convert floating point index to integer.
             int targetIndex = Mathf.FloorToInt(indexedPosition);
             // From this position, the positions of all cells will be calculated.
@@ -403,35 +403,36 @@ namespace SimpleRecyclerCollection
             Vector2 cellSizeWithSpacing = _currentCellSize + LayoutGroup.Spacing;
             float targetPosition = Mathf.FloorToInt(index / (float)_currentTupleCount) * cellSizeWithSpacing[MainAxis];
             targetPosition = Mathf.Clamp(targetPosition + CachedPadding[MainAxis] - (Content.RectTransform.rect.size[MainAxis] - _currentCellSize[MainAxis]) / 2f, 0, MaxScrollPosition);
-            Position[MainAxis] = targetPosition;
+            m_Position[MainAxis] = targetPosition;
             UpdatePosition();
         }
 
         public virtual void SnapTo(TCellData item) => SnapTo(Data.IndexOf(item));
 
-        public virtual void ScrollTo(int index, float duration = .25f) => StartCoroutine(ScrollToImpl(index, duration));
+        public virtual void ScrollTo(int index, float duration = .25f)
+        {
+            Velocity = 0;
+
+            float originPosition = m_Position[MainAxis];
+            AutoScroller.Scroll(duration, t =>
+            {
+                Vector2 cellSizeWithSpacing = _currentCellSize + LayoutGroup.Spacing;
+                float targetPosition = Mathf.FloorToInt(index / (float)_currentTupleCount) * cellSizeWithSpacing[MainAxis];
+                targetPosition = Mathf.Clamp(targetPosition + CachedPadding[MainAxis] - (Content.RectTransform.rect.size[MainAxis] - _currentCellSize[MainAxis]) / 2f, 0, MaxScrollPosition);
+
+                m_Position[MainAxis] = Mathf.Lerp(originPosition, targetPosition, t);
+            });
+        }
 
         public virtual void ScrollTo(TCellData item, float duration = .25f) => ScrollTo(Data.IndexOf(item), duration);
 
-        protected virtual IEnumerator ScrollToImpl(int index, float duration)
+        public virtual void ScrollTo(float position, float duration)
         {
-            Velocity = 0;
-            float originPosition = Position[MainAxis];
-            Vector2 cellSizeWithSpacing = _currentCellSize + LayoutGroup.Spacing;
-            float targetPosition = Mathf.FloorToInt(index / (float)_currentTupleCount) * cellSizeWithSpacing[MainAxis];
-            targetPosition = Mathf.Clamp(targetPosition + CachedPadding[MainAxis] - (Content.RectTransform.rect.size[MainAxis] - _currentCellSize[MainAxis]) / 2f, 0, MaxScrollPosition);
-
-            float time = 0;
-            while (time < duration)
+            float originPosition = m_Position[MainAxis];
+            AutoScroller.Scroll(duration, t =>
             {
-                Position[MainAxis] = Mathf.Lerp(originPosition, targetPosition, time / duration);
-                UpdatePosition();
-                time += Time.deltaTime;
-                yield return null;
-            }
-
-            Position[MainAxis] = targetPosition;
-            UpdatePosition();
+                m_Position[MainAxis] = Mathf.Lerp(originPosition, position, t);
+            });
         }
     }
 }
