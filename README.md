@@ -2,15 +2,10 @@
 
 Generic optimized ScrollRect for Unity that can handle a huge amount of data with using pooling objects. 
 
-It also support different inherited classes for data and views.
-
 ## How to use?
-
 An example is included in the project so you can see how it works and how to implement it correctly.
 
-
 1. Create a cell data class that will store all the information.
-
 ```csharp
 public class MyCellData {
     public string Id;
