@@ -17,7 +17,7 @@ public class MyCellData {
 Don't forget about namespace ```SimpleRecyclerCollection```. Then just create a new GameObject and link ```MyMainCellView``` to this object and connect all the fields. After that, put it in resources.
 
 ```csharp
-public class MyMainCellView: CellView<MyMainCellData> {
+public class MyCellView: CellView<MyCellData> {
     // Important to set before initializing the collection.
     public override RectTransform RectTransform => m_RectTransform;
     [SerializeField] protected RectTransform m_RectTransform;
@@ -31,7 +31,7 @@ public class MyMainCellView: CellView<MyMainCellData> {
             m_RectTransform = GetComponent<RectTransform>();
     }
 
-    public override void OnContentUpdate(int index, MyMainCellData data) {
+    public override void OnContentUpdate(int index, MyCellData data) {
         Title.text = data.Title;
     }
 
@@ -43,7 +43,7 @@ public class MyMainCellView: CellView<MyMainCellData> {
 3. Create a collection class that extends RecyclerCollection. 
 Don't forget about namespace ```SimpleRecyclerCollection```.
 ```csharp
-public class MyCollection: RecyclerCollection<MyMainCellData, MyMainCellView> {}
+public class MyCollection: RecyclerCollection<MyCellData, MyCellView> {}
 ```
 
 4. Create a new GameObject in the scene in the canvas and add the ```MyCollection``` script to this object. 
