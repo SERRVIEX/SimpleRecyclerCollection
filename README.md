@@ -1,5 +1,13 @@
-# SimpleRecyclerCollection (v1.0.1)
+# SimpleRecyclerCollection
 
+[![Version](https://img.shields.io/badge/Version-v1.0.1-brightgreen.svg)](https://github.com/matthiaszarzecki/MadeWithUnityBadges/graphs/commit-activity)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/SERRVIEX/SimpleRecyclerCollection/blob/main/LICENSE) 
+
+## Requirements
+[![Unity 2021.3+](https://img.shields.io/badge/unity-2020+-black.svg?style=flat&logo=unity&cacheSeconds=2592000)](https://unity3d.com/get-unity/download/archive)
+[![.NET 4.x Scripting Runtime](https://img.shields.io/badge/.NET-4.x-blueviolet.svg?style=flat&cacheSeconds=2592000)](https://docs.unity3d.com/2018.3/Documentation/Manual/ScriptingRuntimeUpgrade.html)
+
+## Description
 Generic optimized ScrollRect for Unity that can handle a huge amount of data with using pooling objects. 
 
 ## How to use?
