@@ -2,6 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Version-v1.0.1-brightgreen.svg)](https://github.com/matthiaszarzecki/MadeWithUnityBadges/graphs/commit-activity)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/SERRVIEX/SimpleRecyclerCollection/blob/main/LICENSE) 
+[![Contact](https://img.shields.io/badge/LinkedIn-blue.svg?logo=LinkedIn)](https://www.linkedin.com/in/sergiu-ciornii-466395220/)
 
 ## Requirements
 [![Unity 2021.3+](https://img.shields.io/badge/unity-2020+-black.svg?style=flat&logo=unity&cacheSeconds=2592000)](https://unity3d.com/get-unity/download/archive)
