@@ -1,6 +1,6 @@
 # SimpleRecyclerCollection
 
-[![Version](https://img.shields.io/badge/Version-v1.0.1-brightgreen.svg)](https://github.com/matthiaszarzecki/MadeWithUnityBadges/graphs/commit-activity)
+![Version](https://img.shields.io/badge/Version-v1.0.1-brightgreen.svg)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/SERRVIEX/SimpleRecyclerCollection/blob/main/LICENSE) 
 [![Contact](https://img.shields.io/badge/LinkedIn-blue.svg?logo=LinkedIn)](https://www.linkedin.com/in/sergiu-ciornii-466395220/)
 
