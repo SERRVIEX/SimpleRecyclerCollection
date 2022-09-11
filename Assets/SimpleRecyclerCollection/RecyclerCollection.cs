@@ -1,6 +1,5 @@
 namespace SimpleRecyclerCollection
 {
-    using System.Collections;
     using System.Collections.Generic;
 
     using UnityEngine;
@@ -131,6 +130,7 @@ namespace SimpleRecyclerCollection
                 for (int i = _reusableCells.Count; i < _numberOfCells; i++)
                 {
                     TCellView view = Instantiate(_cellPrefab, Content.RectTransform);
+                    view.Initialize(this);
                     _reusableCells.Add(new ReusableCell(view));
                 }
             }
@@ -344,7 +344,7 @@ namespace SimpleRecyclerCollection
                 contentSize[SecondAxis] -= padding;
                 float size = contentSize[SecondAxis] - (LayoutGroup.Spacing[SecondAxis] * (LayoutGroup.TupleCount - 1));
                 size /= LayoutGroup.TupleCount;
-                _currentCellSize[SecondAxis] = size - padding / LayoutGroup.TupleCount;
+                _currentCellSize[SecondAxis] = size;
                 return;
             }
 
