@@ -11,7 +11,7 @@ namespace SimpleRecyclerCollection
        where TCellData : class
        where TCellView : CellViewContext<TCellData, TContext>
     {
-        protected TContext Context { get; private set; }
+        public TContext Context { get; private set; }
 
         public CollectionData<TCellData> Data
         {
