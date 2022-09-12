@@ -4,14 +4,17 @@ namespace SimpleRecyclerCollection
 
     using SimpleRecyclerCollection.Core;
 
-    public abstract class CellView<TData> : MonoBehaviour
+    public abstract class CellViewContext<TData, TContext> : MonoBehaviour
     {
         public abstract RectTransform RectTransform { get; }
+
         public Collection Collection { get; private set; }
+        public TContext Context { get; private set; }
 
         // Methods
 
         public void SetCollection(Collection collection) => Collection = collection;
+        public void SetContext(TContext context) => Context = context;
         
         public abstract void OnContentUpdate(int index, TData data);
         public abstract void OnPositionUpdate(Vector3 localPosition);

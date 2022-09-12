@@ -7,10 +7,12 @@ namespace SimpleRecyclerCollection
 
     using Core;
 
-    public class RecyclerCollection<TCellData, TCellView> : Collection
+    public class RecyclerCollectionContext<TCellData, TCellView, TContext> : Collection
        where TCellData : class
-       where TCellView : CellView<TCellData>
+       where TCellView : CellViewContext<TCellData, TContext>
     {
+        protected TContext Context { get; private set; }
+
         public CollectionData<TCellData> Data
         {
             get
@@ -95,6 +97,12 @@ namespace SimpleRecyclerCollection
                 return;
             }
 
+            if (Context == null)
+            {
+                Debug.Log($"Context can't be null.");
+                return;
+            }
+
             // Awake is called only if the object is active, so if it isn't active in
             // the hierarchy, force it to get the components.
             if (!gameObject.activeInHierarchy)
@@ -120,6 +128,11 @@ namespace SimpleRecyclerCollection
             RebuildLayout();
         }
 
+        public void SetContext(TContext context)
+        {
+            Context = context;
+        }
+
         protected sealed override void UpdatePool()
         {
             _numberOfCells = Mathf.Clamp(CalculateNumberOfCells(), 0, 512);
@@ -131,6 +144,7 @@ namespace SimpleRecyclerCollection
                 {
                     TCellView view = Instantiate(_cellPrefab, Content.RectTransform);
                     view.SetCollection(this);
+                    view.SetContext(Context);
                     _reusableCells.Add(new ReusableCell(view));
                 }
             }
