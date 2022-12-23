@@ -93,20 +93,18 @@ namespace SimpleRecyclerCollection
 
         [SerializeField] private Vector2 _spacing;
 
-#if UNITY_EDITOR
         [HideInInspector] public UnityEvent OnMarkedDirty = new UnityEvent();
-#endif
 
         // Methods
 
-        private void OnValidate()
-        {
 #if UNITY_EDITOR
+        protected override void OnValidate()
+        {
             if (Application.isPlaying)
                 OnMarkedDirty?.Invoke();
-#endif
 
             _spacing = new Vector2(Mathf.Clamp(_spacing.x, 0, 250), Mathf.Clamp(_spacing.y, 0, 250));
         }
+#endif
     }
 }

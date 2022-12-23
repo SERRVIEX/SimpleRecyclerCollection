@@ -24,7 +24,7 @@ namespace SimpleRecyclerCollection.Core
                     gameObject.AddComponent<CollectionLayoutGroup>();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if(_markedDirty)
             {

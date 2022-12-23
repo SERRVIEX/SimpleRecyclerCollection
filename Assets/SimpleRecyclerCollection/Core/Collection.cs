@@ -1,8 +1,5 @@
 namespace SimpleRecyclerCollection.Core
 {
-    using System;
-    using System.Collections.Generic;
-
     using UnityEngine;
     using UnityEngine.Events;
     using UnityEngine.Assertions;
@@ -32,21 +29,6 @@ namespace SimpleRecyclerCollection.Core
         }
 
         [SerializeField] protected ScrollDirection m_Direction = ScrollDirection.Vertical;
-
-        public MovementType Movement
-        {
-            get => m_Movement;
-            set
-            {
-                m_Movement = value;
-                RebuildLayout();
-            }
-        }
-
-        [SerializeField] protected MovementType m_Movement = MovementType.Elastic;
-
-        public float Elasticity { get => m_Elasticity; set => m_Elasticity = value; }
-        [SerializeField] protected float m_Elasticity = .1f;
 
         public bool Inertia { get => m_Inertia; set => m_Inertia = value; }
         [SerializeField] protected bool m_Inertia = true;
@@ -124,12 +106,14 @@ namespace SimpleRecyclerCollection.Core
             AutoScroller = new AutoScroller(this);
         }
 
+#if UNITY_EDITOR
         protected override void OnValidate()
         {
             base.OnValidate();
 
             RebuildLayout();
         }
+#endif
 
         public abstract void Initialize();
 
@@ -204,13 +188,14 @@ namespace SimpleRecyclerCollection.Core
         {
             if (position < 0)
                 return -position;
+            
 
             if (Content.RectTransform.rect.size[MainAxis] > ContentVirtualSize)
                 return -position;
-
+            
             if (position > MaxScrollPosition)
                 return MaxScrollPosition - position;
-
+            
             return 0;
         }
 
@@ -266,16 +251,8 @@ namespace SimpleRecyclerCollection.Core
                 pointerDelta = -pointerDelta;
 
             m_Position = _positionHelper + pointerDelta;
-
-            if (m_Movement != MovementType.Unrestricted)
-            {
-                float offset = CalculateOffset(m_Position[MainAxis]);
-                m_Position[MainAxis] += offset;
-
-                if (m_Movement == MovementType.Elastic)
-                    if (offset != 0)
-                        m_Position[MainAxis] -= RubberDelta(offset, Content.RectTransform.rect.size[MainAxis] + LayoutGroup.Padding.vertical);
-            }
+            float offset = CalculateOffset(m_Position[MainAxis]);
+            m_Position[MainAxis] += offset;
 
             UpdatePosition();
         }
@@ -320,15 +297,8 @@ namespace SimpleRecyclerCollection.Core
                 {
                     Vector2 position = m_Position;
 
-                    // Apply spring physics if movement is elastic and content has an offset from the view.
-                    if (Movement == MovementType.Elastic && offset != 0)
-                    {
-                        float speed = Velocity;
-                        position[MainAxis] = Mathf.SmoothDamp(m_Position[MainAxis], m_Position[MainAxis] + offset, ref speed, Elasticity, Mathf.Infinity, deltaTime);
-                        Velocity = speed;
-                    }
                     // Else move content according to velocity with deceleration applied.
-                    else if (Inertia)
+                    if (Inertia)
                     {
                         Velocity *= Mathf.Pow(DecelerationRate, deltaTime);
                         if (Mathf.Abs(Velocity) < 1)
@@ -342,11 +312,8 @@ namespace SimpleRecyclerCollection.Core
 
                     if (Velocity != 0)
                     {
-                        if (Movement == MovementType.Clamped)
-                        {
-                            offset = CalculateOffset(position[MainAxis]);
-                            position[MainAxis] += offset;
-                        }
+                        offset = CalculateOffset(position[MainAxis]);
+                        position[MainAxis] += offset;
 
                         m_Position = position;
                         UpdatePosition();

@@ -26,14 +26,6 @@ namespace SimpleRecyclerCollection.Core
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Content"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Direction"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Movement"));
-
-            if (_collection.Movement == MovementType.Elastic)
-            {
-                EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Elasticity"));
-                EditorGUI.indentLevel--;
-            }
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Inertia"));
 
             if (_collection.Inertia)

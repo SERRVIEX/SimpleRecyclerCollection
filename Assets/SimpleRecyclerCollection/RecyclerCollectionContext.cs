@@ -3,6 +3,7 @@ namespace SimpleRecyclerCollection
     using System.Collections.Generic;
 
     using UnityEngine;
+    using UnityEngine.Events;
     using UnityEngine.Assertions;
 
     using Core;
@@ -62,28 +63,6 @@ namespace SimpleRecyclerCollection
         /// Number of cells that can be visible in content rect.
         /// </summary>
         private int _numberOfCells;
-
-        private class ReusableCell
-        {
-            public int Index;
-            public TCellData Data;
-            public TCellView View;
-
-            public bool ActiveSelf
-            {
-                get => View.gameObject.activeSelf;
-                set => View.gameObject.SetActive(value);
-            }
-
-            // Constructors
-
-            public ReusableCell(TCellView view)
-            {
-                Index = -1;
-                View = view;
-                ActiveSelf = false;
-            }
-        }
 
         private List<ReusableCell> _reusableCells = new List<ReusableCell>();
 
@@ -447,6 +426,30 @@ namespace SimpleRecyclerCollection
             {
                 m_Position[MainAxis] = Mathf.Lerp(originPosition, position, t);
             });
+        }
+
+        // Other
+
+        private class ReusableCell
+        {
+            public int Index;
+            public TCellData Data;
+            public TCellView View;
+
+            public bool ActiveSelf
+            {
+                get => View.gameObject.activeSelf;
+                set => View.gameObject.SetActive(value);
+            }
+
+            // Constructors
+
+            public ReusableCell(TCellView view)
+            {
+                Index = -1;
+                View = view;
+                ActiveSelf = false;
+            }
         }
     }
 }
